@@ -13,6 +13,8 @@ namespace Avalonia.Markup.Xaml.XamlIl.CompilerExtensions.Transformers
     sealed class AvaloniaXamlIlWellKnownTypes
     {
         public IXamlType RuntimeHelpers { get; }
+        public IXamlMethod GetPropertyInfoFromPointers { get; }
+        public IXamlMethod GetTypedPropertyInfoFromPointers { get; }
         public IXamlType AvaloniaObject { get; }
         public IXamlType BindingPriority { get; }
         public IXamlType AvaloniaObjectExtensions { get; }
@@ -190,6 +192,10 @@ namespace Avalonia.Markup.Xaml.XamlIl.CompilerExtensions.Transformers
         public AvaloniaXamlIlWellKnownTypes(IXamlTypeSystem typeSystem)
         {
             RuntimeHelpers = typeSystem.GetType("Avalonia.Markup.Xaml.XamlIl.Runtime.XamlIlRuntimeHelpers");
+            GetPropertyInfoFromPointers = RuntimeHelpers.GetMethod(m =>
+                m.Name == "GetPropertyInfoFromPointers" && m.IsGenericMethod);
+            GetTypedPropertyInfoFromPointers = RuntimeHelpers.GetMethod(m =>
+                m.Name == "GetTypedPropertyInfoFromPointers" && m.IsGenericMethod);
 
             XamlIlTypes = typeSystem.WellKnownTypes;
             AvaloniaObject = typeSystem.GetType("Avalonia.AvaloniaObject");

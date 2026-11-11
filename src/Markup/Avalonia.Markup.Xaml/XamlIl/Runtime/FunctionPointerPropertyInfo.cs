@@ -7,12 +7,15 @@ internal sealed unsafe class FunctionPointerPropertyInfo : IPropertyInfo
 {
     private readonly IntPtr _getter;
     private readonly IntPtr _setter;
+    // Keep the generated assembly loaded while its accessor pointers can be invoked.
+    private readonly Type _helperType;
 
-    public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type propertyType)
+    public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type propertyType, Type helperType)
     {
         Name = name;
         _getter = getter;
         _setter = setter;
+        _helperType = helperType;
         PropertyType = propertyType;
     }
 
@@ -41,12 +44,15 @@ internal sealed unsafe class FunctionPointerPropertyInfo<TSource, TValue> : IPro
 {
     private readonly IntPtr _getter;
     private readonly IntPtr _setter;
+    // TSource and TValue may be defined outside the generated assembly.
+    private readonly Type _helperType;
 
-    public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter)
+    public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type helperType)
     {
         Name = name;
         _getter = getter;
         _setter = setter;
+        _helperType = helperType;
     }
 
     public string Name { get; }

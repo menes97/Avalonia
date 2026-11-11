@@ -22,14 +22,16 @@ namespace Avalonia.Markup.Xaml.XamlIl.Runtime
         [ThreadStatic] private static List<IResourceNode>? s_resourceNodeBuffer;
         [ThreadStatic] private static LastParentStack? s_lastParentStack;
 
-        public static IPropertyInfo GetProperty<TValue>(
+        public static IPropertyInfo GetPropertyInfoFromPointers<THelper, TValue>(
             ref IPropertyInfo? field, string name, IntPtr getter, IntPtr setter)
-            => field ??= new FunctionPointerPropertyInfo(name, getter, setter, typeof(TValue));
+            where THelper : class
+            => field ??= new FunctionPointerPropertyInfo(name, getter, setter, typeof(TValue), typeof(THelper));
 
-        public static IPropertyInfo<TSource, TValue> GetTypedProperty<TSource, TValue>(
+        public static IPropertyInfo<TSource, TValue> GetTypedPropertyInfoFromPointers<THelper, TSource, TValue>(
             ref IPropertyInfo<TSource, TValue>? field, string name, IntPtr getter, IntPtr setter)
+            where THelper : class
             where TSource : class
-            => field ??= new FunctionPointerPropertyInfo<TSource, TValue>(name, getter, setter);
+            => field ??= new FunctionPointerPropertyInfo<TSource, TValue>(name, getter, setter, typeof(THelper));
 
         public static Func<IServiceProvider, object> DeferredTransformationFactoryV1(Func<IServiceProvider, object> builder,
             IServiceProvider provider)
