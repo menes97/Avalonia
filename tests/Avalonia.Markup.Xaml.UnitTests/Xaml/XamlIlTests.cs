@@ -567,7 +567,7 @@ namespace Avalonia.Markup.Xaml.UnitTests
         public object ProvideValue(IServiceProvider prov)
         {
             var pvt = prov.GetRequiredService<IProvideValueTarget>();
-            var info = (ClrPropertyInfo)pvt.TargetProperty;
+            var info = (IPropertyInfo)pvt.TargetProperty;
             var v = (int)info.Get(pvt.TargetObject)!;
             return v + 1;
         }

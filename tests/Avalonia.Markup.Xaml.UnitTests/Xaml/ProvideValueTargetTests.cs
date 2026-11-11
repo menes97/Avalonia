@@ -43,7 +43,7 @@ public class ProvideValueTargetTests : XamlTestBase
             item =>
             {
                 Assert.IsAssignableFrom<CompiledBindingExtension>(item.TargetObject);
-                var prop = Assert.IsType<ClrPropertyInfo>(item.TargetProperty);
+                var prop = Assert.IsAssignableFrom<IPropertyInfo>(item.TargetProperty);
                 Assert.Equal(nameof(Binding.Source), prop.Name);
             },
             item =>

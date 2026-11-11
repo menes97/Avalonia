@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
 using Avalonia.Data;
+using Avalonia.Data.Core;
 using Avalonia.Platform;
 
 // ReSharper disable UnusedMember.Global
@@ -20,6 +21,15 @@ namespace Avalonia.Markup.Xaml.XamlIl.Runtime
     {
         [ThreadStatic] private static List<IResourceNode>? s_resourceNodeBuffer;
         [ThreadStatic] private static LastParentStack? s_lastParentStack;
+
+        public static IPropertyInfo GetProperty<TValue>(
+            ref IPropertyInfo? field, string name, IntPtr getter, IntPtr setter)
+            => field ??= new FunctionPointerPropertyInfo(name, getter, setter, typeof(TValue));
+
+        public static IPropertyInfo<TSource, TValue> GetTypedProperty<TSource, TValue>(
+            ref IPropertyInfo<TSource, TValue>? field, string name, IntPtr getter, IntPtr setter)
+            where TSource : class
+            => field ??= new FunctionPointerPropertyInfo<TSource, TValue>(name, getter, setter);
 
         public static Func<IServiceProvider, object> DeferredTransformationFactoryV1(Func<IServiceProvider, object> builder,
             IServiceProvider provider)

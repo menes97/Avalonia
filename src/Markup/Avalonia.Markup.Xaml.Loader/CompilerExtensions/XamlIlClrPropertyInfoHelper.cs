@@ -207,7 +207,7 @@ namespace Avalonia.Markup.Xaml.XamlIl.CompilerExtensions
                     name.AppendSuffix("!Property"), XamlVisibility.Public, true, false);
 
 
-                var factory = types.CompiledPropertyInfoFactory.GetMethod(m =>
+                var factory = types.RuntimeHelpers.GetMethod(m =>
                     m.Name == "GetProperty" && m.IsGenericMethod).MakeGenericMethod([property.PropertyType]);
                 get.Generator
                     .Emit(OpCodes.Ldsflda, field)
@@ -276,7 +276,7 @@ namespace Avalonia.Markup.Xaml.XamlIl.CompilerExtensions
                 var get = _builder.DefineMethod(typedPropertyInfoType, Array.Empty<IXamlType>(),
                     name.AppendSuffix("!Property"), XamlVisibility.Public, true, false);
 
-                var factory = types.CompiledPropertyInfoFactory.GetMethod(m =>
+                var factory = types.RuntimeHelpers.GetMethod(m =>
                     m.Name == "GetTypedProperty" && m.IsGenericMethod).MakeGenericMethod([sourceType, valueType]);
                 get.Generator
                     .Emit(OpCodes.Ldsflda, field)

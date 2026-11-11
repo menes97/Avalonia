@@ -3,12 +3,10 @@ using System.Reflection;
 
 namespace Avalonia.Data.Core
 {
-    public unsafe class ClrPropertyInfo : IPropertyInfo
+    public class ClrPropertyInfo : IPropertyInfo
     {
         private readonly Func<object, object?>? _getter;
         private readonly Action<object, object?>? _setter;
-        private readonly IntPtr _getterPointer;
-        private readonly IntPtr _setterPointer;
 
         public ClrPropertyInfo(string name, Func<object, object?>? getter, Action<object, object?>? setter, Type propertyType)
         {
@@ -18,21 +16,11 @@ namespace Avalonia.Data.Core
             Name = name;
         }
 
-        internal ClrPropertyInfo(string name, IntPtr getter, IntPtr setter, Type propertyType)
-        {
-            _getterPointer = getter;
-            _setterPointer = setter;
-            PropertyType = propertyType;
-            Name = name;
-        }
-
         public string Name { get; }
         public Type PropertyType { get; }
 
         public object? Get(object target)
         {
-            if (_getterPointer != IntPtr.Zero)
-                return ((delegate* managed<object, object?>)_getterPointer.ToPointer())(target);
             if (_getter == null)
                 throw new NotSupportedException("Property " + Name + " doesn't have a getter");
             return _getter(target);
@@ -40,18 +28,13 @@ namespace Avalonia.Data.Core
 
         public void Set(object target, object? value)
         {
-            if (_setterPointer != IntPtr.Zero)
-            {
-                ((delegate* managed<object, object?, void>)_setterPointer.ToPointer())(target, value);
-                return;
-            }
             if (_setter == null)
                 throw new NotSupportedException("Property " + Name + " doesn't have a setter");
             _setter(target, value);
         }
 
-        public bool CanSet => _setter != null || _setterPointer != IntPtr.Zero;
-        public bool CanGet => _getter != null || _getterPointer != IntPtr.Zero;
+        public bool CanSet => _setter != null;
+        public bool CanGet => _getter != null;
     }
 
     public class ReflectionClrPropertyInfo : ClrPropertyInfo
