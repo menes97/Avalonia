@@ -7,7 +7,8 @@ internal sealed unsafe class FunctionPointerPropertyInfo : IPropertyInfo
 {
     private readonly IntPtr _getter;
     private readonly IntPtr _setter;
-    // Keep the generated assembly loaded while its accessor pointers can be invoked.
+    // ALC unload keeps function pointers dangling (even managed ones), so we need to keep our compiler-generated
+    // type referenced. 
     private readonly Type _helperType;
 
     public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type propertyType, Type helperType)
