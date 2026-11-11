@@ -5,13 +5,14 @@ namespace Avalonia.Markup.Xaml.XamlIl.Runtime;
 
 internal sealed unsafe class FunctionPointerPropertyInfo : IPropertyInfo
 {
-    private readonly IntPtr _getter;
-    private readonly IntPtr _setter;
+    private readonly delegate* managed<object, object?> _getter;
+    private readonly delegate* managed<object, object?, void> _setter;
     // ALC unload keeps function pointers dangling (even managed ones), so we need to keep our compiler-generated
-    // type referenced. 
+    // type referenced.
     private readonly Type _helperType;
 
-    public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type propertyType, Type helperType)
+    public FunctionPointerPropertyInfo(string name, delegate* managed<object, object?> getter,
+        delegate* managed<object, object?, void> setter, Type propertyType, Type helperType)
     {
         Name = name;
         _getter = getter;
@@ -22,32 +23,33 @@ internal sealed unsafe class FunctionPointerPropertyInfo : IPropertyInfo
 
     public string Name { get; }
     public Type PropertyType { get; }
-    public bool CanGet => _getter != IntPtr.Zero;
-    public bool CanSet => _setter != IntPtr.Zero;
+    public bool CanGet => _getter != null;
+    public bool CanSet => _setter != null;
 
     public object? Get(object target)
     {
-        if (_getter == IntPtr.Zero)
+        if (_getter == null)
             throw new NotSupportedException("Property " + Name + " doesn't have a getter");
-        return ((delegate* managed<object, object?>)_getter.ToPointer())(target);
+        return _getter(target);
     }
 
     public void Set(object target, object? value)
     {
-        if (_setter == IntPtr.Zero)
+        if (_setter == null)
             throw new NotSupportedException("Property " + Name + " doesn't have a setter");
-        ((delegate* managed<object, object?, void>)_setter.ToPointer())(target, value);
+        _setter(target, value);
     }
 }
 
 internal sealed unsafe class FunctionPointerPropertyInfo<TSource, TValue> : IPropertyInfo<TSource, TValue>
     where TSource : class
 {
-    private readonly IntPtr _getter;
-    private readonly IntPtr _setter;
+    private readonly delegate* managed<TSource, TValue> _getter;
+    private readonly delegate* managed<TSource, TValue, void> _setter;
     private readonly Type _helperType;
 
-    public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type helperType)
+    public FunctionPointerPropertyInfo(string name, delegate* managed<TSource, TValue> getter,
+        delegate* managed<TSource, TValue, void> setter, Type helperType)
     {
         Name = name;
         _getter = getter;
@@ -57,21 +59,21 @@ internal sealed unsafe class FunctionPointerPropertyInfo<TSource, TValue> : IPro
 
     public string Name { get; }
     public Type PropertyType => typeof(TValue);
-    public bool CanGet => _getter != IntPtr.Zero;
-    public bool CanSet => _setter != IntPtr.Zero;
+    public bool CanGet => _getter != null;
+    public bool CanSet => _setter != null;
 
     public TValue Get(TSource target)
     {
-        if (_getter == IntPtr.Zero)
+        if (_getter == null)
             throw new NotSupportedException("Property " + Name + " doesn't have a getter");
-        return ((delegate* managed<TSource, TValue>)_getter.ToPointer())(target);
+        return _getter(target);
     }
 
     public void Set(TSource target, TValue value)
     {
-        if (_setter == IntPtr.Zero)
+        if (_setter == null)
             throw new NotSupportedException("Property " + Name + " doesn't have a setter");
-        ((delegate* managed<TSource, TValue, void>)_setter.ToPointer())(target, value);
+        _setter(target, value);
     }
 
     object? IPropertyInfo.Get(object target) => Get((TSource)target);
