@@ -44,7 +44,6 @@ internal sealed unsafe class FunctionPointerPropertyInfo<TSource, TValue> : IPro
 {
     private readonly IntPtr _getter;
     private readonly IntPtr _setter;
-    // TSource and TValue may be defined outside the generated assembly.
     private readonly Type _helperType;
 
     public FunctionPointerPropertyInfo(string name, IntPtr getter, IntPtr setter, Type helperType)
